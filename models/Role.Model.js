@@ -5,19 +5,19 @@ class Role extends Model {}
 
 Role.init(
   {
-    role: {
+    name: {
       type: DataTypes.ENUM("PlayerUser", "SuperAdmin"),
       allowNull: false,
     },
     userId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
     sequelize,
     tableName: "roles",
-    modelName: "Role",
+    modelName: "roles",
   }
 );
 

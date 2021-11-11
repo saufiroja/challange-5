@@ -7,4 +7,13 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   dialect: "postgres",
 });
 
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("connect on database");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
 module.exports = sequelize;
