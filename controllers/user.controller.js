@@ -6,11 +6,58 @@ const { SECRET } = process.env;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User, Role } = require("../models");
+const { register } = require("../schema/register.schema");
+
+// // error handling
+// const errorHandling = (err) => {
+//   console.log(err.msg, err.code);
+//   let errors = { username: "", email: "", password: "" };
+
+//   // incorrect username
+//   if (err.message === "incorrect username") {
+//     errors.message = "thats username is not registered";
+//     return errors;
+//   }
+
+//   // incorrect email
+//   if (err.message === "incorrect email") {
+//     errors.message = "thats email is not registered";
+//     return errors;
+//   }
+
+//   // incorrect password
+//   if (err.message === "incorrect password") {
+//     errors.message = "thats password is incorrect";
+//     return errors;
+//   }
+
+//   // duplicate code
+//   if (err.code === 11000) {
+//     errors.message = "thats email is already registered";
+//     return errors;
+//   }
+// };
 
 // REGISTER
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
   try {
     const { username, email, password, roleName } = req.body;
+
+    // check user
+    const exist = await User.findOne({
+      where: {
+        email,
+      },
+      attributes: ["id"],
+    });
+
+    if (exist) {
+      throw {
+        message: `user already registered`,
+        code: 400,
+        error: `bad request`,
+      };
+    }
 
     const hashPassword = await bcrypt.hash(password, 12);
 
@@ -40,7 +87,7 @@ exports.register = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.log(error.message);
+    next(error);
   }
 };
 
@@ -59,7 +106,23 @@ exports.login = async (req, res) => {
       },
     });
 
-    await bcrypt.compare(password, exist.password);
+    if (!exist) {
+      throw {
+        message: `User not found`,
+        code: 404,
+        error: `bad request`,
+      };
+    }
+
+    const match = await bcrypt.compare(password, exist.password);
+
+    if (!match) {
+      throw {
+        message: `invalid password`,
+        code: 404,
+        error: `bad request`,
+      };
+    }
 
     const token = jwt.sign(
       { userId: exist.id, roleName: exist.role.name },
@@ -75,6 +138,6 @@ exports.login = async (req, res) => {
       data: token,
     });
   } catch (error) {
-    console.log(error.message);
+    next(error);
   }
 };
