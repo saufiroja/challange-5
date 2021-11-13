@@ -6,39 +6,18 @@ const { SECRET } = process.env;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User, Role } = require("../models");
-const { register } = require("../schema/register.schema");
+const ApiError = require("../error/ErrorApi");
 
-// // error handling
-// const errorHandling = (err) => {
-//   console.log(err.msg, err.code);
-//   let errors = { username: "", email: "", password: "" };
+// GET REGISTER
+exports.viewRegister = (req, res) => {
+  return res.render("register");
+};
 
-//   // incorrect username
-//   if (err.message === "incorrect username") {
-//     errors.message = "thats username is not registered";
-//     return errors;
-//   }
+exports.viewLogin = (req, res) => {
+  return res.render("login");
+};
 
-//   // incorrect email
-//   if (err.message === "incorrect email") {
-//     errors.message = "thats email is not registered";
-//     return errors;
-//   }
-
-//   // incorrect password
-//   if (err.message === "incorrect password") {
-//     errors.message = "thats password is incorrect";
-//     return errors;
-//   }
-
-//   // duplicate code
-//   if (err.code === 11000) {
-//     errors.message = "thats email is already registered";
-//     return errors;
-//   }
-// };
-
-// REGISTER
+// POST REGISTER
 exports.register = async (req, res, next) => {
   try {
     const { username, email, password, roleName } = req.body;
@@ -52,21 +31,19 @@ exports.register = async (req, res, next) => {
     });
 
     if (exist) {
-      throw {
-        message: `user already registered`,
-        code: 400,
-        error: `bad request`,
-      };
+      next(ApiError.badRequest("user already exist"));
     }
 
+    // hash password
     const hashPassword = await bcrypt.hash(password, 12);
 
+    // create user
     const user = await User.create(
       {
         username,
         email,
         password: hashPassword,
-        //pick role
+        // pick role
         role: {
           name: roleName,
         },
@@ -81,18 +58,17 @@ exports.register = async (req, res, next) => {
       }
     );
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "success register user",
-      code: 201,
+      code: 200,
       data: user,
     });
   } catch (error) {
     next(error);
   }
 };
-
-// LOGIN
-exports.login = async (req, res) => {
+// POST LOGIN
+exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -107,21 +83,18 @@ exports.login = async (req, res) => {
     });
 
     if (!exist) {
-      throw {
-        message: `User not found`,
-        code: 404,
-        error: `bad request`,
-      };
+      next(ApiError.badRequest("user not found"));
     }
 
     const match = await bcrypt.compare(password, exist.password);
 
     if (!match) {
-      throw {
-        message: `invalid password`,
-        code: 404,
-        error: `bad request`,
-      };
+      // throw {
+      //   message: `invalid password`,
+      //   code: 404,
+      //   error: `bad request`,
+      // };
+      next(ApiError.badRequest("invalid password"));
     }
 
     const token = jwt.sign(
