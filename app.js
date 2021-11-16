@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/user.router");
 const dashboardRouter = require("./routes/dashboard.controller");
 const errorHandler = require("./error/Error.Handler");
@@ -9,6 +10,7 @@ const app = express();
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // konfigurasi ejs
 app.set("view engine", "ejs");
@@ -16,6 +18,10 @@ app.set("view engine", "ejs");
 // router
 app.use(userRouter);
 app.use(dashboardRouter);
+
+app.get("/game", (req, res) => {
+  return res.render("game");
+});
 
 // error handler
 app.use(errorHandler);
