@@ -97,18 +97,26 @@ exports.login = async (req, res, next) => {
       next(ApiError.badRequest("invalid password"));
     }
 
+    const maxAge = 3 * 24 * 60 * 60;
     const token = jwt.sign(
       { userId: exist.id, roleName: exist.role.name },
       SECRET,
       {
-        expiresIn: "7 days",
+        expiresIn: maxAge,
       }
     );
+
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+    });
 
     return res.status(200).json({
       message: "success login",
       code: 200,
-      data: token,
+      userId: exist.id,
+      roleName: exist.role.name,
+      token,
     });
   } catch (error) {
     next(error);
