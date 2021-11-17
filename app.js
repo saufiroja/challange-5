@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/user.router");
 const dashboardRouter = require("./routes/dashboard.controller");
 const errorHandler = require("./error/Error.Handler");
-const requireAuth = require("./middlewares/auth.middleware");
+const { requireAuth, currentUser } = require("./middlewares/auth.middleware");
 const app = express();
 
 // middleware
@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 // router
+app.get("*", currentUser);
 app.use(userRouter);
 app.use(dashboardRouter);
 
