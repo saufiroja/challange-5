@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 // secret jwt
 const { SECRET } = process.env;
 const jwt = require("jsonwebtoken");
@@ -23,4 +21,4 @@ const requireAuth = (req, res, next) => {
   }
 };
 
-module.exports = { requireAuth };
+module.exports = requireAuth;
