@@ -99,7 +99,7 @@ exports.login = async (req, res, next) => {
 
     const maxAge = 3 * 24 * 60 * 60;
     const token = jwt.sign(
-      { userId: exist.id, roleName: exist.role.name },
+      { user: exist.username, userId: exist.id, roleName: exist.role.name },
       SECRET,
       {
         expiresIn: maxAge,
@@ -122,4 +122,10 @@ exports.login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// GET LOG OUT
+exports.logout = (req, res) => {
+  res.cookie("jwt", "", { maxAge: 1 });
+  return res.redirect("/dashboard");
 };
