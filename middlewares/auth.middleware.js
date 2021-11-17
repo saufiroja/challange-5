@@ -1,9 +1,10 @@
 // secret jwt
 const { SECRET } = process.env;
 const jwt = require("jsonwebtoken");
+const { User } = require("../models");
 
 // authorized
-const requireAuth = (req, res, next) => {
+exports.requireAuth = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (token) {
@@ -21,4 +22,25 @@ const requireAuth = (req, res, next) => {
   }
 };
 
-module.exports = requireAuth;
+// current user
+exports.currentUser = (req, res, next) => {
+  const token = req.cookies.jwt;
+
+  if (token) {
+    jwt.verify(token, SECRET, async (err, decodedToken) => {
+      if (err) {
+        console.log(err.message);
+        res.locals.user = null;
+        next();
+      } else {
+        console.log(decodedToken);
+        let user = await User.findOne(decodedToken.id);
+        res.locals.user = user;
+        next();
+      }
+    });
+  } else {
+    res.locals.user = null;
+    next();
+  }
+};
