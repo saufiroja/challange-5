@@ -111,13 +111,14 @@ exports.login = async (req, res, next) => {
       maxAge: maxAge * 1000,
     });
 
-    return res.status(200).json({
-      message: "success login",
-      code: 200,
-      userId: exist.id,
-      roleName: exist.role.name,
-      token,
-    });
+    return res.status(200).redirect("/dashboard");
+    // return res.status(200).json({
+    //   message: "success login",
+    //   code: 200,
+    //   userId: exist.id,
+    //   roleName: exist.role.name,
+    //   token,
+    // });
   } catch (error) {
     next(error);
   }
