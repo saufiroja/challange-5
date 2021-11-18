@@ -4,20 +4,45 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 
 // authorized
-exports.requireAuth = (req, res, next) => {
-  const token = req.cookies.jwt;
+exports.requireAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
 
-  if (token) {
-    jwt.verify(token, SECRET, (err, decodedToken) => {
-      if (err) {
-        console.log("gagal verifikasi");
-        res.redirect("/login");
-      } else {
-        console.log(decodedToken);
-        next();
-      }
+    if (!token) {
+      throw {
+        code: 401,
+        message: "invalid token",
+        error: "unauthorized",
+      };
+    }
+
+    const validToken = jwt.verify(token, SECRET, {});
+
+    if (!validToken) {
+      throw {
+        code: 401,
+        message: "invalid token",
+        error: "unauthorized",
+      };
+    }
+
+    const user = await User.findOne({
+      where: {
+        id: validToken.userId,
+      },
     });
-  } else {
-    res.redirect("/login");
+
+    if (!user) {
+      throw {
+        code: 401,
+        message: "invalid token",
+        error: "unauthorized",
+      };
+    }
+
+    req.user = user.dataValues;
+    next();
+  } catch (error) {
+    next(error);
   }
 };

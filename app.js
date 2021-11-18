@@ -24,9 +24,15 @@ app.use(userRouter);
 app.use(dashboardRouter);
 
 app.get("/room", requireAuth, (req, res) => {
-  const { cookie } = req.headers;
-  const token = cookie.split("=")[1];
-  console.log(token);
+  const { user } = req;
+  return res.status(200).json({
+    code: 200,
+    message: "success verify user",
+    data: {
+      username: user.username,
+      email: user.email,
+    },
+  });
   return res.send("berhasil masuk");
 });
 

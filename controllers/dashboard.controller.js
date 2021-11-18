@@ -1,3 +1,6 @@
 exports.dashboard = async (req, res) => {
-  return res.render("dashboard");
+  const { user } = req;
+  return res.render("dashboard", {
+    username: user.username,
+  });
 };
