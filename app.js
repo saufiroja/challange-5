@@ -3,11 +3,11 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./error/Error.Handler");
-const { requireAuth } = require("./middlewares/auth.middleware");
 
 // router
 const userRouter = require("./routes/user.router");
 const dashboardRouter = require("./routes/dashboard.router");
+const roomRouter = require("./routes/room.router");
 
 const app = express();
 
@@ -22,19 +22,7 @@ app.set("view engine", "ejs");
 // router
 app.use(userRouter);
 app.use(dashboardRouter);
-
-app.get("/room", requireAuth, (req, res) => {
-  const { user } = req;
-  return res.status(200).json({
-    code: 200,
-    message: "success verify user",
-    data: {
-      username: user.username,
-      email: user.email,
-    },
-  });
-  return res.send("berhasil masuk");
-});
+app.use(roomRouter);
 
 // error handler
 app.use(errorHandler);
