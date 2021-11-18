@@ -14,7 +14,6 @@ const { loginSchema } = require("../schema/login.schema");
 // GET
 router.get("/register", viewRegister);
 router.get("/login", viewLogin);
-router.get("/logout", logout);
 
 // POST
 router.post("/register", validate(registerSchema), register);

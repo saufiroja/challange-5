@@ -1,3 +1,3 @@
-exports.dashboard = (req, res) => {
+exports.dashboard = async (req, res) => {
   return res.render("dashboard");
 };

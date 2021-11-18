@@ -2,10 +2,13 @@ require("dotenv").config();
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const userRouter = require("./routes/user.router");
-const dashboardRouter = require("./routes/dashboard.controller");
 const errorHandler = require("./error/Error.Handler");
-const { requireAuth, currentUser } = require("./middlewares/auth.middleware");
+const { requireAuth } = require("./middlewares/auth.middleware");
+
+// router
+const userRouter = require("./routes/user.router");
+const dashboardRouter = require("./routes/dashboard.router");
+
 const app = express();
 
 // middleware
@@ -17,12 +20,14 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 // router
-app.get("*", currentUser);
 app.use(userRouter);
 app.use(dashboardRouter);
 
-app.get("/game", requireAuth, (req, res) => {
-  return res.render("game");
+app.get("/room", requireAuth, (req, res) => {
+  const { cookie } = req.headers;
+  const token = cookie.split("=")[1];
+  console.log(token);
+  return res.send("berhasil masuk");
 });
 
 // error handler

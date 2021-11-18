@@ -89,11 +89,6 @@ exports.login = async (req, res, next) => {
     const match = await bcrypt.compare(password, exist.password);
 
     if (!match) {
-      // throw {
-      //   message: `invalid password`,
-      //   code: 404,
-      //   error: `bad request`,
-      // };
       next(ApiError.badRequest("invalid password"));
     }
 
@@ -111,21 +106,15 @@ exports.login = async (req, res, next) => {
       maxAge: maxAge * 1000,
     });
 
-    return res.status(200).redirect("/dashboard");
-    // return res.status(200).json({
-    //   message: "success login",
-    //   code: 200,
-    //   userId: exist.id,
-    //   roleName: exist.role.name,
-    //   token,
-    // });
+    // return res.status(200).redirect("/dashboard");
+    return res.status(200).json({
+      message: "success login",
+      code: 200,
+      userId: exist.id,
+      roleName: exist.role.name,
+      token,
+    });
   } catch (error) {
     next(error);
   }
-};
-
-// GET LOG OUT
-exports.logout = (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  return res.redirect("/dashboard");
 };
