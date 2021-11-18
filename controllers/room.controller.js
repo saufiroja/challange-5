@@ -1,20 +1,8 @@
 const Room = require("../models/Room.Model");
 
-exports.room = async (req, res, next) => {
+exports.room = (req, res, next) => {
   try {
     const { user } = req;
-    const { name, flag } = req.body;
-
-    if (user) {
-      const rooms = await Room.create({
-        name,
-        flag,
-      });
-
-      return res.status(200).json({
-        room: rooms.dataValues,
-      });
-    }
 
     return res.status(200).json({
       code: 200,
@@ -24,6 +12,26 @@ exports.room = async (req, res, next) => {
         email: user.email,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.createRoom = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { name, flag } = req.body;
+
+    if (user) {
+      const roomCreate = await Room.create({
+        name,
+        flag,
+      });
+
+      return res.status(200).json({
+        room: roomCreate.dataValues,
+      });
+    }
   } catch (error) {
     next(error);
   }
